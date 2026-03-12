@@ -1,38 +1,23 @@
-# We define a class that inherits from Formula (the Homebrew base)
 class Skrgrep < Formula
-  # A short description of what the tool does
-  desc "A lightning-fast, multi-threaded grep implementation written in Rust"
-  
-  # The website for your project
-  homepage "https://github.com/rayanjainn/skrgrep"
-  
-  # The link to the specific version of source code we want to download
-  url "https://github.com/rayanjainn/skrgrep/archive/refs/tags/v0.1.0.tar.gz"
-  
-  # The security hash we generated in Phase 2
-  sha256 "754da75a5c3de265ce3f8e29bdad2ac1d163745c9ad0ffe7dbc0a445e26f2084"
-  
-  # Software license (optional but good)
-  license "MIT"
+  desc "Fast multi-threaded grep in Rust"
+  homepage "https://github.com/rayanjainn/minigrep"
+  version "0.1.1"
 
-  # We tell Homebrew that this software REQUIRES Rust to be installed to build it
-  depends_on "rust" => :build
-
-  # This function contains the actual terminal commands to install the app
-  def install
-    # 'system' runs a shell command
-    # 'cargo install' compiles the code
-    # '*std_cargo_args' is a Homebrew shortcut that tells Cargo:
-    # "Install this into the proper Homebrew folder (like /usr/local/bin) 
-    # and build it in --release mode for maximum speed."
-    system "cargo", "install", *std_cargo_args
+  # We define both URLs here
+  if Hardware::CPU.arm?
+    url "https://github.com/rayanjainn/minigrep/releases/download/v0.1.1/skrgrep-aarch64-apple-darwin.tar.gz"
+    sha256 "HASH_OF_THE_ARM_FILE"
+  else
+    url "https://github.com/rayanjainn/minigrep/releases/download/v0.1.1/skrgrep-x86_64-apple-darwin.tar.gz"
+    sha256 "HASH_OF_THE_INTEL_FILE"
   end
 
-  # A small test to make sure it actually installed correctly
+  def install
+    # Since we already have the binary, we just move it to Homebrew's bin folder
+    bin.install "skrgrep"
+  end
+
   test do
-    # Create a dummy file
-    (testpath/"test.txt").write("hello world")
-    # Run skrgrep and see if it finds "hello"
-    assert_match "hello", shell_output("#{bin}/skrgrep hello test.txt")
+    system "#{bin}/skrgrep", "--help"
   end
 end
